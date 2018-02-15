@@ -2,10 +2,13 @@
    DWF Python Example
    Author:  Digilent, Inc.
    Revision: 10/17/2013
+   Edited by AP on 2/14/2018
 
    Requires:                       
        Python 2.7, numpy, matplotlib
        python-dateutil, pyparsing
+   
+   Make sure dwfconstants.py is in the same directory as this script
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -148,16 +151,10 @@ for k in range(len(freqSpan)):
         sample = np.asarray(freqRespStorage[l][k])
         spec[l][k] = np.fft.rfft(sample)
         dSample = hzAcq.value
-        #print 'sample rate is = ' + str(dSample)
-        # dSample = 1/hzAcq #Sample spacing (1/sampler rate)
         fD[l][k] = np.fft.fftfreq(len(sample), d=1/float(dSample))
         freqDomain[l][k] = np.concatenate((np.array([0]), fD[l][k][:len(sample) / 2]))
 
 dwf.FDwfDeviceClose(hdwf)
-
-#plt.figure(1)
-#plt.plot(rgpy)
-#plt.show()
 
 #Sum signals at same frequency
 m = np.asarray(spec)
@@ -173,22 +170,16 @@ for k in range(len(freqSpan)):
         lowerIndex = int(max([rejectIndex,(freqSpan[k]/(sFreq/float(nSamples)))-2]))
         upperIndex = int(freqSpan[k]/(sFreq/float(nSamples)))+10
         maximum[l][k] = max(normSamples[lowerIndex:upperIndex])
-        #summation = m_r + m_i
-        #absolute = abs(summation)
         print 'Max absolute at '+str(freqSpan[k])+' Hz sample '+str(l)+' = ' + str(maximum[l][k])
 
         plt.figure(1)
         plt.plot(freqDomain[l][k],normSamples,(0.5, 0.5, 0.5))
-        #plt.plot(freqDomain,abs(spec.real),'-r',freqDomain,abs(spec.imag),'-k')
         plt.show()
-        #plt.show(block=False)
-        #plt.pause(5)
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Amp (???)')
         plt.title('FFT of received signal')
         axes = plt.gca()
         axes.set_xlim([0,5000])
-        #axes.set_ylim([0,1000])
 
 SPL_Out = [float(x)/n for x in sum(np.asarray(maximum))]
 plt.figure(2)
